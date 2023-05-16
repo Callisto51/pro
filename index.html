@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>صفحة التعليقات</title>
+  <style>
+    /* تنسيق المظهر */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+    }
+    form {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    label {
+      display: block;
+      font-weight: bold;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    .comment {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+    .comment h3 {
+      margin-top: 0;
+    }
+    .comment p {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>صفحة التعليقات</h1>
+  
+  <form>
+    <label for="name">الاسم:</label>
+    <input type="text" id="name" name="name" required>
+    
+    <label for="comment">التعليق:</label>
+    <textarea id="comment" name="comment" required></textarea>
+    
+    <button type="submit">إرسال</button>
+  </form>
+  
+  <div id="comments">
+    <!-- سيتم عرض التعليقات هنا -->
+  </div>
+  
+  <script>
+    // تحميل التعليقات من ملف JSON
+    fetch("comments.json")
+      .then(response => response.json())
+      .then(comments => {
+        // عرض التعليقات على الصفحة
+        const commentsDiv = document.getElementById('comments');
+        comments.forEach(comment => {
+          const commentDiv = document.createElement('div');
+          commentDiv.classList.add('comment');
+          commentDiv.innerHTML = `
+            <h3>${comment.name}</h3>
+            <p>${comment.comment}</p>
+          `;
+          commentsDiv.appendChild(commentDiv);
+        });
+      });
+      
+    // إضافة تعليق جديد
+    const form = document.querySelector('form');
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const name = document.getElementById('name').value;
+      const comment = document.getElementById('comment').value;
+      const newComment = { name, comment };
+      fetch('comments.json', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newComment)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        // تحديث عرض التعليقات
+        const commentsDiv = document.getElementById('comments');
+        const commentDiv = document.createElement('div');
+        commentDiv.classList.add('comment');
+        commentDiv.innerHTML = `
+          <h3>${name}</h3>
+          <p>${comment}</p>
+        `;
+        commentsDiv.appendChild(commentDiv);
+        // إفراغ حقول الإدخال
+        document.getElementById('name').value = '';
+        document.getElementById('comment').value = '';
+      });
+    });
+  </script>
+</body>
+</html>
